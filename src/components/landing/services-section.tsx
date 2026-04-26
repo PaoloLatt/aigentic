@@ -4,12 +4,17 @@ import { useState } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { SERVICES } from "@/lib/constants";
+import { gtmEvent } from "@/components/shared/analytics";
 
 export default function ServicesSection() {
   const [openIndex, setOpenIndex] = useState(0);
 
   const toggleAccordion = (index: number) => {
+    const isOpening = openIndex !== index;
     setOpenIndex(openIndex === index ? -1 : index);
+    if (isOpening) {
+      gtmEvent("service_expand", { service_name: SERVICES[index].title });
+    }
   };
 
   return (

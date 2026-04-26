@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Check, X } from "lucide-react";
 import { USE_CASES } from "@/lib/constants";
+import { gtmEvent } from "@/components/shared/analytics";
 
 export default function UseCasesSection() {
   // Take first 3 use cases (or filter by is_featured if exists)
@@ -121,6 +122,7 @@ export default function UseCasesSection() {
         >
           <a
             href="/use-cases"
+            onClick={() => gtmEvent("cta_click", { label: "Vedi tutti use cases" })}
             className="inline-flex items-center text-accent-blue hover:text-accent-blue/80 transition-colors font-medium"
           >
             Vedi tutti gli use cases →

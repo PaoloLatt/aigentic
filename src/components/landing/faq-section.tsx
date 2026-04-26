@@ -4,12 +4,17 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { FAQS } from "@/lib/constants";
+import { gtmEvent } from "@/components/shared/analytics";
 
 export default function FaqSection() {
   const [openIndex, setOpenIndex] = useState(0);
 
   const toggleFaq = (index: number) => {
+    const isOpening = openIndex !== index;
     setOpenIndex(openIndex === index ? -1 : index);
+    if (isOpening) {
+      gtmEvent("faq_expand", { question: FAQS[index].question });
+    }
   };
 
   return (

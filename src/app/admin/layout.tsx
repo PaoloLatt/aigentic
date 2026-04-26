@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -10,6 +10,7 @@ import {
   Plug,
   Settings,
   ExternalLink,
+  LogOut,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -27,9 +28,17 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  if (pathname === "/admin/login") return <>{children}</>;
 
   const isActive = (href: string) =>
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
+
+  const handleLogout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" });
+    router.push("/admin/login");
+  };
 
   return (
     <div className="h-screen flex overflow-hidden bg-background">
@@ -69,7 +78,7 @@ export default function AdminLayout({
         </nav>
 
         {/* Footer */}
-        <div className="px-3 py-4 border-t border-border">
+        <div className="px-3 py-4 border-t border-border space-y-0.5">
           <Link
             href="/"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
@@ -77,6 +86,13 @@ export default function AdminLayout({
             <ExternalLink className="w-4 h-4 flex-shrink-0" />
             Torna al sito
           </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-text-secondary hover:text-accent-red hover:bg-accent-red/10 transition-colors"
+          >
+            <LogOut className="w-4 h-4 flex-shrink-0" />
+            Esci
+          </button>
         </div>
       </aside>
 

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { HERO_STATS } from "@/lib/constants";
+import { gtmEvent } from "@/components/shared/analytics";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -73,12 +74,14 @@ export default function Hero() {
         >
           <a
             href="#contatti"
+            onClick={() => gtmEvent("cta_click", { label: "Prenota consulenza gratuita" })}
             className="bg-accent-blue text-white px-8 py-4 rounded-lg font-semibold hover:bg-accent-blue/90 transition-colors"
           >
             Prenota una consulenza gratuita
           </a>
           <a
             href="#servizi"
+            onClick={() => gtmEvent("cta_click", { label: "Scopri cosa automatizziamo" })}
             className="border border-accent-blue text-accent-blue px-8 py-4 rounded-lg font-semibold hover:bg-accent-blue hover:text-white transition-colors"
           >
             Scopri cosa automatizziamo ↓

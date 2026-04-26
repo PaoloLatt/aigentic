@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Navbar from "@/components/landing/navbar";
 import Hero from "@/components/landing/hero";
 import ServicesSection from "@/components/landing/services-section";
@@ -7,6 +8,18 @@ import IntegrationsSection from "@/components/landing/integrations-section";
 import FaqSection from "@/components/landing/faq-section";
 import ContactSection from "@/components/landing/contact-section";
 import Footer from "@/components/landing/footer";
+
+export const metadata: Metadata = {
+  title: "AgentForge — Agenti AI per PMI",
+  description:
+    "Progettiamo agenti AI che automatizzano marketing, vendite e customer service per PMI italiane. ROI misurabile, deploy in meno di 4 settimane.",
+  openGraph: {
+    title: "AgentForge — Agenti AI per PMI",
+    description:
+      "Agenti AI su misura per Marketing, Sales e Customer Service. Automatizza i processi, libera il team.",
+    url: "https://agentforge.it",
+  },
+};
 
 export default function Home() {
   return (

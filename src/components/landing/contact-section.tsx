@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useRef, type FormEvent } from "react";
 import { motion } from "framer-motion";
+import { gtmEvent } from "@/components/shared/analytics";
 
 const interestOptions = [
   "Marketing Agents",
@@ -23,9 +24,17 @@ export default function ContactSection() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const formStarted = useRef(false);
 
   const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleFormStart = () => {
+    if (!formStarted.current) {
+      formStarted.current = true;
+      gtmEvent("form_start", { form_name: "contatti" });
+    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -45,6 +54,8 @@ export default function ContactSection() {
         setError(payload.error || "Errore durante l'invio del form.");
         setSubmitted(false);
       } else {
+        gtmEvent("form_submit", { form_name: "contatti", interest_area: formData.interest });
+        gtmEvent("generate_lead", { interest_area: formData.interest });
         setSubmitted(true);
         setFormData({
           name: "",
@@ -108,6 +119,7 @@ export default function ContactSection() {
                     required
                     value={formData.name}
                     onChange={(event) => handleChange("name", event.target.value)}
+                    onFocus={handleFormStart}
                     className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-text-primary outline-none focus:border-accent-blue"
                     type="text"
                     placeholder="Mario Rossi"
