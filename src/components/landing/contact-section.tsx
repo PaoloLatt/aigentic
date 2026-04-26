@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 
 const interestOptions = [
@@ -21,22 +21,45 @@ export default function ContactSection() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData((current) => ({ ...current, [field]: value }));
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Contact form data:", formData);
-    setSubmitted(true);
-    setFormData({
-      name: "",
-      email: "",
-      company: "",
-      interest: "Marketing Agents",
-      message: "",
-    });
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const payload = await response.json();
+
+      if (!response.ok || !payload.success) {
+        setError(payload.error || "Errore durante l'invio del form.");
+        setSubmitted(false);
+      } else {
+        setSubmitted(true);
+        setFormData({
+          name: "",
+          email: "",
+          company: "",
+          interest: "Marketing Agents",
+          message: "",
+        });
+      }
+    } catch (err) {
+      setError("Impossibile inviare il form. Riprova più tardi.");
+      setSubmitted(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -142,11 +165,13 @@ export default function ContactSection() {
               <div className="space-y-3">
                 <button
                   type="submit"
-                  className="w-full rounded-2xl bg-accent-blue px-6 py-4 text-sm font-semibold text-white hover:bg-accent-blue/90 transition-colors"
+                  disabled={loading}
+                  className="w-full rounded-2xl bg-accent-blue px-6 py-4 text-sm font-semibold text-white hover:bg-accent-blue/90 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Richiedi una consulenza gratuita →
+                  {loading ? "Invio in corso..." : "Richiedi una consulenza gratuita →"}
                 </button>
-                {submitted && (
+                {error && <p className="text-red-400 text-sm">{error}</p>}
+                {submitted && !error && (
                   <p className="text-accent-green text-sm">Grazie! Ti risponderemo entro 24 ore.</p>
                 )}
                 <p className="text-text-tertiary text-sm">
