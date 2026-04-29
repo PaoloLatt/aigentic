@@ -12,7 +12,6 @@ import {
   Check,
   X,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -358,29 +357,14 @@ function LogsTab() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function load() {
-      if (!supabase) {
-        setError("Supabase non configurato.");
-        setLoading(false);
-        return;
-      }
-      const { data, error: err } = await supabase
-        .from("consent_logs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(100);
-      if (err) {
-        setError(
-          err.message.includes("does not exist")
-            ? "Tabella consent_logs non ancora creata. Esegui lo schema SQL."
-            : err.message
-        );
-      } else {
-        setLogs(data ?? []);
-      }
-      setLoading(false);
-    }
-    load();
+    fetch("/api/admin/consent-logs")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.error) throw new Error(d.error);
+        setLogs(d.logs ?? []);
+      })
+      .catch((e: Error) => setError(e.message))
+      .finally(() => setLoading(false));
   }, []);
 
   const exportCsv = () => {
@@ -542,51 +526,12 @@ function StatsTab() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function load() {
-      if (!supabase) {
-        setLoading(false);
-        return;
-      }
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-
-      const { data } = await supabase
-        .from("consent_logs")
-        .select("action, categories")
-        .gte("created_at", startOfMonth.toISOString());
-
-      if (!data || data.length === 0) {
-        setLoading(false);
-        return;
-      }
-
-      const total = data.length;
-      const accept_all = data.filter((d) => d.action === "accept_all").length;
-      const reject_all = data.filter((d) => d.action === "reject_all").length;
-      const custom = data.filter((d) => d.action === "custom").length;
-      const analytics_pct = Math.round(
-        (data.filter((d) => d.categories?.analytics).length / total) * 100
-      );
-      const marketing_pct = Math.round(
-        (data.filter((d) => d.categories?.marketing).length / total) * 100
-      );
-      const functional_pct = Math.round(
-        (data.filter((d) => d.categories?.functional).length / total) * 100
-      );
-
-      setStats({
-        total,
-        accept_all,
-        reject_all,
-        custom,
-        analytics_pct,
-        marketing_pct,
-        functional_pct,
-      });
-      setLoading(false);
-    }
-    load();
+    fetch("/api/admin/consent-logs")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.stats) setStats(d.stats);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
