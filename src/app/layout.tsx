@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import { CookieConsentProvider } from "@/lib/cookie-consent";
 import Analytics from "@/components/shared/analytics";
+import CookieBanner from "@/components/shared/cookie-banner";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -44,8 +46,6 @@ export const viewport: Viewport = {
   themeColor: "#050507",
 };
 
-const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -55,18 +55,13 @@ export default function RootLayout({
       className={`${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {gtmId && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-              height="0"
-              width="0"
-              style={{ display: "none", visibility: "hidden" }}
-            />
-          </noscript>
-        )}
-        <Analytics />
-        {children}
+        <CookieConsentProvider>
+          {/* Consent Mode defaults (beforeInteractive) + conditional script loading */}
+          <Analytics />
+          {/* GDPR banner + floating preferences button */}
+          <CookieBanner />
+          {children}
+        </CookieConsentProvider>
       </body>
     </html>
   );

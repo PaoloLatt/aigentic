@@ -1,9 +1,14 @@
 "use client";
 
+import Link from "next/link";
+import { useCookieConsent } from "@/lib/cookie-consent";
+
 export default function Footer() {
+  const { openPreferences } = useCookieConsent();
+
   return (
     <footer className="bg-background border-t border-border py-10 px-4">
-      <div className="max-w-6xl mx-auto flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+      <div className="max-w-6xl mx-auto flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-blue to-accent-green flex items-center justify-center text-white font-bold">
             A
@@ -32,7 +37,28 @@ export default function Footer() {
           </a>
         </div>
 
-        <p className="text-text-tertiary text-sm">© 2026 AgentForge. Tutti i diritti riservati.</p>
+        <div className="flex flex-wrap items-center gap-4 text-sm text-text-tertiary">
+          <Link
+            href="/privacy-policy"
+            className="hover:text-text-secondary transition-colors"
+          >
+            Privacy Policy
+          </Link>
+          <Link
+            href="/privacy-policy#cookie"
+            className="hover:text-text-secondary transition-colors"
+          >
+            Cookie Policy
+          </Link>
+          <button
+            onClick={openPreferences}
+            className="hover:text-text-secondary transition-colors"
+          >
+            Gestisci cookie
+          </button>
+          <span className="hidden md:inline">·</span>
+          <span>© 2026 AgentForge.</span>
+        </div>
       </div>
     </footer>
   );

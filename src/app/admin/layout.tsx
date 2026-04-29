@@ -11,6 +11,7 @@ import {
   Settings,
   ExternalLink,
   LogOut,
+  Cookie,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -18,6 +19,7 @@ const NAV_ITEMS = [
   { href: "/admin/leads", label: "Lead", icon: Users },
   { href: "/admin/contenuti", label: "Contenuti", icon: FileText },
   { href: "/admin/use-cases", label: "Use Cases", icon: Layers },
+  { href: "/admin/cookie-banner", label: "Cookie Banner", icon: Cookie },
   { href: "/admin/integrazioni", label: "Integrazioni", icon: Plug },
   { href: "/admin/impostazioni", label: "Impostazioni", icon: Settings },
 ];
