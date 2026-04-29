@@ -1,9 +1,45 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { supabase } from "@/lib/supabase";
 import { createHubSpotContact } from "@/lib/hubspot";
 import { sendLeadNotification } from "@/lib/slack";
 import { sendConfirmationEmail, sendTeamNotification } from "@/lib/email";
 import type { Lead } from "@/types";
+
+// ── GET /api/leads — admin only ──────────────────────────────────────────────
+
+export async function GET(request: Request) {
+  const cookieStore = await cookies();
+  const auth = cookieStore.get("admin_auth");
+  if (!auth || auth.value !== "authenticated") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!supabase) {
+    return NextResponse.json({ error: "Supabase non configurato." }, { status: 500 });
+  }
+
+  const url = new URL(request.url);
+  const status = url.searchParams.get("status");
+
+  let query = supabase
+    .from("leads")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(200);
+
+  if (status && status !== "Tutti") {
+    query = query.eq("status", status);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ leads: data ?? [] });
+}
 
 const companyEmailPatterns = [/gmail\.com$/i, /yahoo\.com$/i, /hotmail\.com$/i, /outlook\.com$/i, /live\.com$/i];
 
